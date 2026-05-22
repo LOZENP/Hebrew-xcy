@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hebrew</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #080808;
+      --surface: #0f0f0f;
+      --border: #1a1a1a;
+      --border-light: #222;
+      --accent: #c8a96e;
+      --text: #e8e8e8;
+      --text-muted: #555;
+      --text-dim: #333;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 48px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,8,8,0.95);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width 0.25s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--accent); }
+    .nav-links a.active::after { width: 100%; }
+
+    /* HAMBURGER */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--text-muted);
+      transition: all 0.3s;
+    }
+
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .nav-mobile-menu {
+      display: none;
+      position: fixed;
+      top: 64px; left: 0; right: 0;
+      background: rgba(8,8,8,0.98);
+      border-bottom: 1px solid var(--border);
+      padding: 24px;
+      flex-direction: column;
+      gap: 0;
+      z-index: 99;
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-mobile-menu.open { display: flex; }
+
+    .nav-mobile-menu a {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .nav-mobile-menu a:last-child { border-bottom: none; }
+    .nav-mobile-menu a:hover,
+    .nav-mobile-menu a.active { color: var(--accent); }
+
+    /* PAGES */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 48px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-tag {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.2s;
+    }
+
+    .hero-tag::before { content: '//'; margin-right: 10px; opacity: 0.4; }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(52px, 8vw, 110px);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.35s;
+    }
+
+    .hero-title .line-accent { color: var(--accent); display: block; }
+    .hero-title .line-dim { color: var(--text-dim); display: block; font-weight: 700; }
+
+    .hero-desc {
+      max-width: 460px;
+      font-size: 12px;
+      line-height: 1.9;
+      color: var(--text-muted);
+      margin-bottom: 52px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.5s;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.65s;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 13px 30px;
+      background: var(--accent);
+      color: #080808;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover { opacity: 0.82; transform: translateY(-2px); }
+
+    .btn-ghost {
+      display: inline-block;
+      padding: 12px 30px;
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      background: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ORBS */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      opacity: 0.07;
+      animation: orbPulse 7s ease-in-out infinite;
+    }
+
+    .orb1 { width: 500px; height: 500px; background: var(--accent); top: 10%; right: 5%; }
+    .orb2 { width: 350px; height: 350px; background: var(--accent); bottom: 15%; left: 0%; animation-delay: 3.5s; }
+
+    @keyframes orbPulse {
+      0%, 100% { opacity: 0.04; transform: scale(1); }
+      50%       { opacity: 0.1; transform: scale(1.08); }
+    }
+
+    /* PARTICLES */
+    .particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+
+    .particle {
+      position: absolute;
+      width: 1px; height: 1px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      animation: floatParticle var(--dur) ease-in-out infinite var(--delay);
+    }
+
+    @keyframes floatParticle {
+      0%   { opacity: 0; transform: translateY(100vh) translateX(0); }
+      10%  { opacity: 0.5; }
+      90%  { opacity: 0.2; }
+      100% { opacity: 0; transform: translateY(-10vh) translateX(var(--drift)); }
+    }
+
+    /* MARQUEE */
+    .marquee-wrap {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 0;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 30s linear infinite;
+    }
+
+    .marquee-item {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 0 40px;
+      white-space: nowrap;
+    }
+
+    .marquee-item span { color: var(--accent); margin-right: 8px; }
+
+    /* CONTENT SECTIONS */
+    .content-section {
+      padding: 100px 48px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 48px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      max-width: 60px;
+      height: 1px;
+      background: var(--border-light);
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(26px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      line-height: 1.1;
+    }
+
+    .section-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.9;
+      max-width: 480px;
+      margin-bottom: 64px;
+    }
+
+    /* FEATURES GRID */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .feature-card {
+      background: var(--bg);
+      padding: 36px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.25s;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover { background: var(--surface); }
+    .feature-card:hover::before { transform: scaleX(1); }
+
+    .feature-num {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+
+    .feature-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .feature-desc {
+      font-size: 12px;
+      line-height: 1.75;
+      color: var(--text-muted);
+    }
+
+    /* NOTICE */
+    .notice {
+      background: rgba(200,169,110,0.06);
+      border: 1px solid rgba(200,169,110,0.18);
+      padding: 20px 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-top: 64px;
+    }
+
+    .notice-icon {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 500;
+      white-space: nowrap;
+      padding-top: 1px;
+    }
+
+    .notice-text {
+      font-size: 12px;
+      line-height: 1.75;
+      color: var(--text-muted);
+    }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* SCRIPTS PAGE */
+    .scripts-hero {
+      padding: 120px 48px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .scripts-hero-tag {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.1s;
+    }
+
+    .scripts-hero-tag::before { content: '//'; margin-right: 10px; opacity: 0.4; }
+
+    .scripts-hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.25s;
+    }
+
+    .scripts-hero p {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.9;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.4s;
+    }
+
+    /* CAROUSEL */
+    .carousel-section {
+      padding: 60px 0 80px;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .carousel-label {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 32px;
+      padding: 0 48px;
+    }
+
+    .carousel-track-wrap { overflow: hidden; }
+
+    .carousel-track {
+      display: flex;
+      gap: 20px;
+      padding: 0 48px;
+      animation: carouselSlide 22s linear infinite;
+      width: max-content;
+    }
+
+    .carousel-track:hover { animation-play-state: paused; }
+
+    @keyframes carouselSlide {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .carousel-card {
+      flex-shrink: 0;
+      width: 280px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.25s;
+      cursor: pointer;
+    }
+
+    .carousel-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+
+    .carousel-card img {
+      width: 100%;
+      height: 155px;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.8);
+      transition: filter 0.25s;
+    }
+
+    .carousel-card:hover img { filter: brightness(1); }
+
+    .carousel-card-body { padding: 18px 20px; }
+
+    .carousel-card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .carousel-card-tag {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    /* SCRIPTS LIST */
+    .scripts-list-section { padding: 80px 48px; }
+
+    .script-item {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin-bottom: 1px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.25s;
+    }
+
+    .script-item.visible { opacity: 1; transform: translateX(0); }
+    .script-item:hover { border-color: var(--accent); }
+
+    .script-item-inner {
+      display: grid;
+      grid-template-columns: 180px 1fr auto;
+      align-items: stretch;
+    }
+
+    .script-item-img {
+      width: 180px;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.75);
+      transition: filter 0.25s;
+      flex-shrink: 0;
+    }
+
+    .script-item:hover .script-item-img { filter: brightness(1); }
+
+    .script-item-info {
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-left: 1px solid var(--border);
+      min-width: 0;
+    }
+
+    .script-item-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .script-item-meta {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .script-item-action {
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      border-left: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .script-get-btn {
+      display: inline-block;
+      padding: 10px 22px;
+      background: var(--accent);
+      color: #080808;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .script-get-btn:hover { opacity: 0.82; transform: translateY(-1px); }
+
+    /* EXECUTORS PAGE */
+    .executors-hero {
+      padding: 120px 48px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .executors-hero-tag {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.1s;
+    }
+
+    .executors-hero-tag::before { content: '//'; margin-right: 10px; opacity: 0.4; }
+
+    .executors-hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.25s;
+    }
+
+    .executors-hero p {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.9;
+      max-width: 500px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.4s;
+    }
+
+    .executors-grid {
+      padding: 80px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .executor-card {
+      background: var(--bg);
+      padding: 40px 36px;
+      position: relative;
+      transition: background 0.25s;
+    }
+
+    .executor-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .executor-card:hover { background: var(--surface); }
+    .executor-card:hover::before { transform: scaleX(1); }
+
+    .executor-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .executor-status {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      margin-bottom: 20px;
+    }
+
+    .status-confirmed {
+      background: rgba(200,169,110,0.12);
+      color: var(--accent);
+      border: 1px solid rgba(200,169,110,0.28);
+    }
+
+    .status-unconfirmed {
+      background: rgba(85,85,85,0.12);
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+    }
+
+    .executor-desc {
+      font-size: 12px;
+      line-height: 1.75;
+      color: var(--text-muted);
+    }
+
+    .executor-note {
+      margin: 80px 48px 0;
+      background: rgba(200,169,110,0.06);
+      border: 1px solid rgba(200,169,110,0.18);
+      padding: 20px 28px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .executor-note-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+      padding-top: 1px;
+    }
+
+    .executor-note-text {
+      font-size: 12px;
+      line-height: 1.75;
+      color: var(--text-muted);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 80px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .footer-copy {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .footer-links { display: flex; gap: 28px; }
+
+    .footer-links a {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+
+      .hero { padding: 100px 24px 60px; }
+      .hero-title { font-size: clamp(44px, 12vw, 72px); }
+
+      .content-section { padding: 60px 24px; }
+
+      .scripts-hero,
+      .executors-hero { padding: 100px 24px 48px; }
+
+      .scripts-list-section { padding: 60px 24px; }
+
+      .script-item-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .script-item-img {
+        width: 100%;
+        height: 160px;
+      }
+
+      .script-item-info {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        padding: 20px;
+      }
+
+      .script-item-name {
+        font-size: 15px;
+        white-space: normal;
+      }
+
+      .script-item-action {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        padding: 16px 20px;
+      }
+
+      .carousel-section { padding: 40px 0 60px; }
+      .carousel-label { padding: 0 24px; }
+      .carousel-track { padding: 0 24px; }
+      .carousel-card { width: 240px; }
+
+      .executors-grid { padding: 40px 24px; }
+      .executor-note { margin: 40px 24px 0; }
+
+      footer {
+        padding: 24px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .hero-actions { flex-direction: column; align-items: flex-start; }
+
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title { font-size: clamp(38px, 14vw, 60px); }
+      .scripts-hero h1,
+      .executors-hero h1 { font-size: clamp(32px, 10vw, 52px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo" onclick="showPage('home')">Hebrew</span>
+    <ul class="nav-links">
+      <li><a onclick="showPage('home')" class="active" id="nav-home">Home</a></li>
+      <li><a onclick="showPage('scripts')" id="nav-scripts">Scripts</a></li>
+      <li><a onclick="showPage('executors')" id="nav-executors">Executors</a></li>
+    </ul>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="nav-mobile-menu" id="mobileMenu">
+    <a onclick="showPage('home');closeMenu()" id="mob-home" class="active">Home</a>
+    <a onclick="showPage('scripts');closeMenu()" id="mob-scripts">Scripts</a>
+    <a onclick="showPage('executors');closeMenu()" id="mob-executors">Executors</a>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="page-home">
+    <section class="hero">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+      <div class="particles" id="particles"></div>
+      <p class="hero-tag">Roblox Executor Scripts</p>
+      <h1 class="hero-title">
+        <span class="line-dim">Welcome to</span>
+        <span class="line-accent">Hebrew.</span>
+      </h1>
+      <p class="hero-desc">
+        A curated collection of high-quality scripts built for Roblox executors.
+        Clean, reliable, and actively maintained. No bloat. No nonsense.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="showPage('scripts')">View Scripts</button>
+        <button class="btn-ghost" onclick="document.getElementById('about-anchor').scrollIntoView({behavior:'smooth'})">Learn More</button>
+      </div>
+    </section>
+
+    <div class="marquee-wrap">
+      <div class="marquee-track">
+        <div class="marquee-item"><span>*</span>Hebrew Scripts</div>
+        <div class="marquee-item"><span>*</span>Roblox Executor</div>
+        <div class="marquee-item"><span>*</span>Clean Code</div>
+        <div class="marquee-item"><span>*</span>Lightweight</div>
+        <div class="marquee-item"><span>*</span>Reliable</div>
+        <div class="marquee-item"><span>*</span>Updated Regularly</div>
+        <div class="marquee-item"><span>*</span>Hebrew Scripts</div>
+        <div class="marquee-item"><span>*</span>Roblox Executor</div>
+        <div class="marquee-item"><span>*</span>Clean Code</div>
+        <div class="marquee-item"><span>*</span>Lightweight</div>
+        <div class="marquee-item"><span>*</span>Reliable</div>
+        <div class="marquee-item"><span>*</span>Updated Regularly</div>
+      </div>
+    </div>
+
+    <div id="about-anchor"></div>
+    <section class="content-section">
+      <p class="section-label reveal">About</p>
+      <h2 class="section-title reveal">Built different.<br>Works every time.</h2>
+      <p class="section-sub reveal">
+        Hebrew is a personal script hub providing executor-ready Lua scripts for Roblox.
+        Every script is written from scratch, tested thoroughly, and kept up to date.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <p class="feature-num">01</p>
+          <h3 class="feature-title">Clean Scripts</h3>
+          <p class="feature-desc">No stolen code. No junk. Every script is written clean and structured for readability and performance.</p>
+        </div>
+        <div class="feature-card reveal">
+          <p class="feature-num">02</p>
+          <h3 class="feature-title">Executor Ready</h3>
+          <p class="feature-desc">Scripts work out of the box with major Roblox executors. Just paste and run.</p>
+        </div>
+        <div class="feature-card reveal">
+          <p class="feature-num">03</p>
+          <h3 class="feature-title">Actively Maintained</h3>
+          <p class="feature-desc">Roblox updates break things. Scripts here get patched and updated when needed.</p>
+        </div>
+        <div class="feature-card reveal">
+          <p class="feature-num">04</p>
+          <h3 class="feature-title">No Nonsense</h3>
+          <p class="feature-desc">No key systems. No fake features. No bloated UIs unless the script calls for it.</p>
+        </div>
+      </div>
+
+      <div class="notice reveal">
+        <span class="notice-icon">Notice</span>
+        <p class="notice-text">
+          These scripts are intended for educational and personal use only.
+          Use responsibly. The creator is not liable for any misuse or account actions taken by Roblox.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <span class="footer-logo">Hebrew</span>
+      <span class="footer-copy">2026 &copy; All Rights Reserved</span>
+      <div class="footer-links">
+        <a onclick="showPage('home')">Home</a>
+        <a onclick="showPage('scripts')">Scripts</a>
+        <a onclick="showPage('executors')">Executors</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- SCRIPTS PAGE -->
+  <div class="page" id="page-scripts">
+    <div class="scripts-hero">
+      <p class="scripts-hero-tag">Browse</p>
+      <h1>Scripts.</h1>
+      <p>All scripts below are tested and ready to use. Just copy the loadstring and execute.</p>
+    </div>
+
+    <div class="carousel-section">
+      <p class="carousel-label">// Featured</p>
+      <div class="carousel-track-wrap">
+        <div class="carousel-track" id="carouselTrack"></div>
+      </div>
+    </div>
+
+    <div class="scripts-list-section">
+      <p class="section-label">All Scripts</p>
+
+      <div class="script-item" id="script-1">
+        <div class="script-item-inner">
+          <img class="script-item-img" src="https://i.ibb.co/q3qT9TZ2/no-Filter-3.webp" alt="Survive Zombie Arena" onerror="this.style.background='#1a1a1a';this.removeAttribute('src')" />
+          <div class="script-item-info">
+            <p class="script-item-name">Survive Zombie Arena</p>
+            <p class="script-item-meta">Roblox Script &nbsp;/&nbsp; Updated 2026</p>
+          </div>
+          <div class="script-item-action">
+            <a class="script-get-btn" href="https://loot-link.com/s?ogGU9PDO" target="_blank">Get Script</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="script-item" id="script-2">
+        <div class="script-item-inner">
+          <img class="script-item-img" src="https://i.ibb.co/bR6R3dNm/no-Filter-2.png" alt="1+ Speed Baddie Escape" onerror="this.style.background='#1a1a1a';this.removeAttribute('src')" />
+          <div class="script-item-info">
+            <p class="script-item-name">1+ Speed Baddie Escape</p>
+            <p class="script-item-meta">Roblox Script &nbsp;/&nbsp; Updated 2026</p>
+          </div>
+          <div class="script-item-action">
+            <a class="script-get-btn" href="https://loot-link.com/s?079QgpFk" target="_blank">Get Script</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      <span class="footer-logo">Hebrew</span>
+      <span class="footer-copy">2026 &copy; All Rights Reserved</span>
+      <div class="footer-links">
+        <a onclick="showPage('home')">Home</a>
+        <a onclick="showPage('scripts')">Scripts</a>
+        <a onclick="showPage('executors')">Executors</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- EXECUTORS PAGE -->
+  <div class="page" id="page-executors">
+    <div class="executors-hero">
+      <p class="executors-hero-tag">Compatibility</p>
+      <h1>Supported<br>Executors.</h1>
+      <p>
+        Listed below are the Roblox executors tested with Hebrew scripts.
+        Compatibility is still being verified for most executors.
+      </p>
+    </div>
+
+    <div class="executors-grid">
+      <div class="executor-card reveal">
+        <p class="executor-name">Delta</p>
+        <span class="executor-status status-confirmed">Confirmed</span>
+        <p class="executor-desc">
+          Primary executor used for development and testing.
+          All Hebrew scripts are built and verified on Delta first.
+        </p>
+      </div>
+      <div class="executor-card reveal">
+        <p class="executor-name">Others</p>
+        <span class="executor-status status-unconfirmed">Not Yet Confirmed</span>
+        <p class="executor-desc">
+          Compatibility with other executors has not yet been verified.
+          Scripts may or may not work. Testing is ongoing.
+        </p>
+      </div>
+    </div>
+
+    <div class="executor-note reveal">
+      <span class="executor-note-label">Note</span>
+      <p class="executor-note-text">
+        This list will be updated as more executors are tested. If you have confirmed compatibility
+        with another executor, this page will be updated accordingly.
+      </p>
+    </div>
+
+    <footer>
+      <span class="footer-logo">Hebrew</span>
+      <span class="footer-copy">2026 &copy; All Rights Reserved</span>
+      <div class="footer-links">
+        <a onclick="showPage('home')">Home</a>
+        <a onclick="showPage('scripts')">Scripts</a>
+        <a onclick="showPage('executors')">Executors</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // PAGE NAVIGATION
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+      document.querySelectorAll('.nav-mobile-menu a').forEach(a => a.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      document.getElementById('nav-' + name).classList.add('active');
+      const mob = document.getElementById('mob-' + name);
+      if (mob) mob.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(initReveal, 100);
+      if (name === 'scripts') {
+        buildCarousel();
+        animateScriptItems();
+      }
+    }
+
+    // HAMBURGER
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const btn = document.getElementById('hamburger');
+      menu.classList.toggle('open');
+      btn.classList.toggle('open');
+    }
+
+    function closeMenu() {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.getElementById('hamburger').classList.remove('open');
+    }
+
+    // PARTICLES
+    function spawnParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.cssText = `
+          left: ${Math.random() * 100}%;
+          width: ${Math.random() * 2 + 1}px;
+          height: ${Math.random() * 2 + 1}px;
+          --dur: ${Math.random() * 12 + 8}s;
+          --delay: ${Math.random() * 10}s;
+          --drift: ${(Math.random() - 0.5) * 80}px;
+        `;
+        container.appendChild(p);
+      }
+    }
+
+    // SCROLL REVEAL
+    function initReveal() {
+      const els = document.querySelectorAll('.page.active .reveal');
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+      }, { threshold: 0.1 });
+      els.forEach(el => obs.observe(el));
+    }
+
+    // SCRIPT ITEMS STAGGER
+    function animateScriptItems() {
+      document.querySelectorAll('.script-item').forEach((el, i) => {
+        el.classList.remove('visible');
+        setTimeout(() => el.classList.add('visible'), 80 + i * 100);
+      });
+    }
+
+    // AUTO CAROUSEL FROM SCRIPTS LIST
+    function buildCarousel() {
+      const scripts = document.querySelectorAll('.script-item');
+      const track = document.getElementById('carouselTrack');
+      const cards = [];
+
+      scripts.forEach(item => {
+        const img = item.querySelector('.script-item-img');
+        const name = item.querySelector('.script-item-name');
+        if (!img || !name) return;
+        cards.push({ src: img.src, alt: img.alt, title: name.textContent.trim() });
+      });
+
+      if (cards.length === 0) return;
+
+      // Need at least enough cards to fill the track for smooth looping
+      let doubled = [...cards, ...cards];
+      // If only 1-2 scripts, repeat more to fill the carousel
+      while (doubled.length < 8) doubled = [...doubled, ...cards];
+
+      track.innerHTML = doubled.map(c => `
+        <div class="carousel-card">
+          <img src="${c.src}" alt="${c.alt}" onerror="this.style.background='#1a1a1a';this.removeAttribute('src')" />
+          <div class="carousel-card-body">
+            <p class="carousel-card-title">${c.title}</p>
+            <p class="carousel-card-tag">Roblox Script</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // INIT
+    spawnParticles();
+    initReveal();
+    buildCarousel();
+  </script>
+
+</body>
+</html>
