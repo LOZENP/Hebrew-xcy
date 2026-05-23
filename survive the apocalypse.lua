@@ -7,7 +7,7 @@ local CONFIG = {
         "*∆*",
         "*∆*"
     },
-    LootLabsLink = "https://loot-link.com/s?YEwgXgpy" -- Replace with your link
+    LootLabsLink = "https://lootdest.org/s?ZCFMHpTR" -- Replace with your link
 }
 
 local function validateKey(key)
@@ -68,7 +68,7 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 0, 0, 10)
 Title.Size = UDim2.new(1, 0, 0, 30)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "AUX HUB"
+Title.Text = "Survive The Apocalypse"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 22
 Title.TextTransparency = 0
@@ -214,8 +214,8 @@ SubmitButton.MouseButton1Click:Connect(function()
         ScreenGui:Destroy()
         
         -- YOUR MAIN SCRIPT HERE
-        print("Aux Hub Loaded Successfully!")
-        loadstring(game:HttpGet("note for me replace your own URL"))()
+        print("Loaded done.")
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/LOZENP/Hebrew-xcy/refs/heads/main/obfuscated_script-1779516900139.lua"))()
         
     else
         StatusLabel.Text = "Invalid Key!"
